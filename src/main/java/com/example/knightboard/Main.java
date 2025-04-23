@@ -18,11 +18,11 @@ import static com.example.knightboard.json.JsonService.fetchJson;
 import static com.example.knightboard.model.Board.toMatrix;
 
 public class Main {
-//todo end to end test, add env variables
+    //todo end to end test
     public static void main(String[] args) throws IOException {
-        ExitStatus exitStatus = null;
+        ExitStatus exitStatus;
         try{
-            var boardApiUrl = "https://storage.googleapis.com/jobrapido-backend-test/board.json";
+            var boardApiUrl = System.getenv("BOARD_API");
             var boardJson = fetchJson(boardApiUrl);
             var mapper = new ObjectMapper();
             var boardPojo = mapper.readValue(boardJson, Board.class);
@@ -31,7 +31,7 @@ public class Main {
             var knightPosition = new KnightPosition();
 
             var commandMapper = new ObjectMapper();
-            var commandApiUrl = "https://storage.googleapis.com/jobrapido-backend-test/commands.json";
+            var commandApiUrl = System.getenv("COMMANDS_API");
             var commandJson = fetchJson(commandApiUrl);
             Map<String, List<String>> map = commandMapper.readValue(commandJson, new TypeReference<>() {});
             var commands = map.get("commands");
