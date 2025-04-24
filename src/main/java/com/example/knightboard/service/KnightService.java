@@ -10,6 +10,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class KnightService {
 
+    // it is an attribute instead of a parameter of the functions that are using it just because of the simplicity of the application
     private final KnightPosition knightPosition;
     private final int[][] board;
 
@@ -18,7 +19,7 @@ public class KnightService {
 
     public void start(int x, int y, Direction direction){
         // assuming that knight start position can be re-set
-        if(y > board.length || x > board[0].length || Objects.equals(1, board[x][y])) { throw new DomainException("INVALID_START_POSITION"); }
+        if(y > board.length || x > board[0].length || Objects.equals(1, board[y][x])) { throw new DomainException("INVALID_START_POSITION"); }
 
         knightPosition.setX(x);
         knightPosition.setY(y);
@@ -31,16 +32,15 @@ public class KnightService {
 
     public void move(int step){
         // no start position
-        if(Objects.isNull(knightPosition.getDirection())) { throw new RuntimeException(); }
+        if(Objects.isNull(knightPosition.getDirection())) { throw new RuntimeException("No starting position set"); }
 
         var newX = knightPosition.getX() + (step * knightPosition.getDirection().dx);
         var newY = knightPosition.getY() + (step * knightPosition.getDirection().dy);
         setNewPosition(newX, newY);
     }
 
-    //todo test empty board
     private void checkOutOfTheBoardPosition(int x, int y){
-        if(y > board.length || x > board[0].length){
+        if(y < 0 || x < 0 || y > board.length - 1 || x > board[0].length - 1){
             throw new DomainException("OUT_OF_THE_BOARD");
         }
     }
@@ -61,7 +61,6 @@ public class KnightService {
             var step = currX <= target ? 1 : -1;
             canIncrement = !Objects.equals(currX, target) && checkForObstacles(knightPosition.getY(), currX + step);
             if(canIncrement){
-                checkOutOfTheBoardPosition(currX + step, knightPosition.getY());
                 knightPosition.setX(currX + step);
             }
         } else{
@@ -69,7 +68,6 @@ public class KnightService {
             var step = currY <= target ? 1 : -1;
             canIncrement = !Objects.equals(currY, target) && checkForObstacles(currY + step, knightPosition.getX());
             if(canIncrement){
-                checkOutOfTheBoardPosition(knightPosition.getX(), currY + step);
                 knightPosition.setY(currY + step);
             }
         }
@@ -77,6 +75,7 @@ public class KnightService {
     }
 
     private boolean checkForObstacles(int y, int x){
+        checkOutOfTheBoardPosition(x, y);
         return !Objects.equals(1, board[y][x]);
     }
 
